@@ -201,7 +201,7 @@
       .container {
         flex-direction: column;
         padding: 5px;
-        gap: 10px;
+        gap: 5px;
         height: auto;
       }
 
@@ -210,9 +210,32 @@
         max-width: 600px;
         height: auto;
         min-height: auto;
-        padding: 10px;
-        gap: 10px;
+        padding: 8px;
+        gap: 5px;
         order: 1;
+      }
+
+      .score-section {
+        flex-direction: row;
+        gap: 3px;
+      }
+
+      .score-box {
+        padding: 3px;
+        flex: 1;
+      }
+
+      .score-box h3 {
+        font-size: 0.9rem;
+      }
+
+      .instructions-box {
+        padding: 5px;
+        font-size: 0.8rem;
+      }
+
+      .food-table td {
+        padding: 2px 0;
       }
 
       #game-container {
@@ -228,21 +251,6 @@
         height: 100% !important;
       }
 
-      .score-section {
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 5px;
-      }
-
-      .score-box {
-        flex: 1;
-        padding: 5px;
-      }
-
-      .instructions-box {
-        padding: 8px;
-      }
-
       .mobile-rules { display: block; }
       .desktop-rules { display: none; }
 
@@ -255,40 +263,33 @@
       }
 
       .return-box {
-        margin-bottom: 5px;
-        padding: 5px;
-      }
-    }
-
-    /* Extra Small Devices */
-    @media (max-width: 480px) {
-      .container {
         padding: 3px;
-      }
-
-      .sidebar {
-        padding: 8px;
-      }
-
-      .score-section {
-        gap: 3px;
-      }
-
-      .score-box h3 {
-        font-size: 0.9rem;
-      }
-
-      .instructions-box {
-        font-size: 0.8rem;
+        margin-bottom: 3px;
       }
 
       .control-box {
-        padding: 3px 8px;
+        padding: 3px 6px;
+      }
+    }
+
+    /* Extra tight layout for very small screens */
+    @media (max-height: 700px) {
+      .container {
+        gap: 3px;
+      }
+      
+      .sidebar {
+        padding: 5px;
+        gap: 3px;
+      }
+
+      .instructions-box {
+        padding: 3px;
       }
     }
   </style>
 </head>
-<body class="light-mode">
+<body>
   <div class="container">
     <!-- Game Container -->
     <div id="game-container"></div>
@@ -365,12 +366,22 @@
       </div>
     </div>
   </div>
-  
-  <script>
+<script>
     // Theme toggle icons
     const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
     const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
-    document.getElementById("toggle-mode-btn").innerHTML = sunIcon;
+
+    // Check system theme preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    document.body.classList.add(prefersDarkScheme.matches ? 'dark-mode' : 'light-mode');
+    document.getElementById("toggle-mode-btn").innerHTML = prefersDarkScheme.matches ? moonIcon : sunIcon;
+
+    // Listen for system theme changes
+    prefersDarkScheme.addListener((e) => {
+      document.body.classList.remove('dark-mode', 'light-mode');
+      document.body.classList.add(e.matches ? 'dark-mode' : 'light-mode');
+      document.getElementById("toggle-mode-btn").innerHTML = e.matches ? moonIcon : sunIcon;
+    });
     
     // Check if device is mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -423,7 +434,7 @@
       initGame();
 
       if (isMobile) {
-        // Add touch event listeners
+// Add touch event listeners
         const canvasElement = document.querySelector("#game-container canvas");
         canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false });
         canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -580,7 +591,9 @@
         }
         
         this.body.unshift(newHead);
-        if (newHead.x === food.x && newHead.y === food.y) {
+        
+        // Improved food collision detection
+        if (Math.abs(newHead.x - food.x) < gridSize/2 && Math.abs(newHead.y - food.y) < gridSize/2) {
           if (food.type === "apple") {
             score += 10;
             this.growth += 1;
@@ -590,9 +603,7 @@
           }
           updateScore();
           food = createFood();
-        }
-        
-        if (this.growth > 0) {
+        } else if (this.growth > 0) {
           this.growth--;
         } else {
           this.body.pop();
