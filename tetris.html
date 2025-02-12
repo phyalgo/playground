@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tetris</title>
+  <!-- p5.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <style>
+    /* Global Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: monospace; }
+    
+    /* Light/Dark Themes */
+    body.dark-mode {
+      background-color: #181a1b;
+      color: #fff;
+    }
+    body.light-mode {
+      background-color: #f5f5f5;
+      color: #000;
+    }
+    
+    /* Main Container */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    /* Game Container */
+    #game-container {
+      width: 300px;
+      height: 600px;
+      border: 2px solid currentColor;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      overflow: hidden;
+      background-color: inherit;
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+    }
+    
+    /* Side Menu */
+    .sidebar {
+      width: 300px;
+      height: 600px;
+      padding: 20px;
+      border: 2px solid currentColor;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      background-color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    
+    /* Score Boxes */
+    .score-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .score-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    
+    /* Next Piece Preview */
+    .next-piece-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .next-piece-box h3 {
+      margin-bottom: 10px;
+    }
+    #next-canvas {
+      display: block;
+      margin: 0 auto;
+      image-rendering: pixelated;
+      background-color: inherit;
+    }
+    
+    /* Instructions */
+    .instructions-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    
+    /* Controls */
+    .control-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .game-controls {
+      display: flex;
+      gap: 10px;
+    }
+    .control-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 5px 10px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .control-box button {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+    /* Theme Toggle */
+    .theme-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+    }
+    .theme-box button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+    }
+    
+    /* Light Mode adjustments */
+    body.light-mode .score-box,
+    body.light-mode .next-piece-box,
+    body.light-mode .instructions-box,
+    body.light-mode .control-box,
+    body.light-mode .theme-box {
+      border: 2px solid #000;
+    }
+  </style>
+</head>
+<body class="dark-mode">
+  <div class="container">
+    <!-- Game Container -->
+    <div id="game-container"></div>
+    
+    <!-- Side Menu -->
+    <div class="sidebar">
+      <!-- Score Boxes -->
+      <div class="score-section">
+        <div class="score-box" id="score-box">
+          <h3>Score</h3>
+          <p id="score">0</p>
+        </div>
+        <div class="score-box" id="last-score-box">
+          <h3>Last Score</h3>
+          <p id="last-score">0</p>
+        </div>
+        <div class="score-box" id="highest-score-box">
+          <h3>High Score</h3>
+          <p id="highest-score">0</p>
+        </div>
+      </div>
+      
+      <!-- Next Piece Preview -->
+      <div class="next-piece-box">
+        <h3>Next Piece</h3>
+        <canvas id="next-canvas" width="120" height="120"></canvas>
+      </div>
+      
+      <!-- Instructions -->
+      <div class="instructions-box">
+        <p>Rotate: R | Drop Faster: hold S</p>
+      </div>
+      
+      <!-- Controls -->
+      <div class="control-section">
+        <div class="game-controls">
+          <div class="control-box">
+            <button id="start-btn">Start</button>
+          </div>
+          <div class="control-box">
+            <button id="pause-btn">Pause</button>
+          </div>
+        </div>
+        <div class="theme-box">
+          <button id="toggle-mode-btn"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Theme toggle icons
+    const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
+    document.getElementById("toggle-mode-btn").innerHTML = moonIcon;
+
+    /* ================================
+                  Tetris
+       ================================ */
+       
+    // Board dimensions
+    const COLS = 10;
+    const ROWS = 20;
+    const CELL_SIZE = 30;
+    const BLOCK_SIZE = 28;
+    const BLOCK_OFFSET = (CELL_SIZE - BLOCK_SIZE) / 2;
+    
+    // Canvas dimensions
+    const canvasWidth = COLS * CELL_SIZE;
+    const canvasHeight = ROWS * CELL_SIZE;
+    
+    // Game variables
+    let board;
+    let currentPiece;
+    let nextPiece;
+    let dropInterval = 800;
+    let lastDropTime = 0;
+    let score = 0;
+    let lastScore = 0;
+    let highScore = 0;
+    let gameOverFlag = false;
+    
+    // Tetromino definitions
+    const tetrominoes = [
+      { name: 'I', shape: [[1,1,1,1]], color: "#5DADE2" },
+      { name: 'J', shape: [
+          [1,0,0],
+          [1,1,1]
+        ], color: "#85C1E9" },
+      { name: 'L', shape: [
+          [0,0,1],
+          [1,1,1]
+        ], color: "#F5B041" },
+      { name: 'O', shape: [
+          [1,1],
+          [1,1]
+        ], color: "#F4D03F" },
+      { name: 'S', shape: [
+          [0,1,1],
+          [1,1,0]
+        ], color: "#58D68D" },
+      { name: 'T', shape: [
+          [0,1,0],
+          [1,1,1]
+        ], color: "#AF7AC5" },
+      { name: 'Z', shape: [
+          [1,1,0],
+          [0,1,1]
+        ], color: "#EC7063" }
+    ];
+
+    function createBoard() {
+      let b = [];
+      for (let r = 0; r < ROWS; r++) {
+        b[r] = [];
+        for (let c = 0; c < COLS; c++) {
+          b[r][c] = 0;
+        }
+      }
+      return b;
+    }
+    
+    function rotateMatrix(matrix) {
+      let m = matrix.length;
+      let n = matrix[0].length;
+      let result = [];
+      for (let c = 0; c < n; c++) {
+        result[c] = [];
+        for (let r = m - 1; r >= 0; r--) {
+          result[c].push(matrix[r][c]);
+        }
+      }
+      return result;
+    }
+    
+    function rotatePiece(piece) {
+      let rotated = rotateMatrix(piece.shape);
+      if (isValidPosition({ ...piece, shape: rotated }, 0, 0)) {
+        piece.shape = rotated;
+      }
+      return rotated;
+    }
+    
+    function isValidPosition(piece, offsetX, offsetY) {
+      const shape = piece.shape;
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c]) {
+            let newX = piece.x + c + offsetX;
+            let newY = piece.y + r + offsetY;
+            if (newX < 0 || newX >= COLS || newY >= ROWS) return false;
+            if (newY >= 0 && board[newY][newX] !== 0) return false;
+          }
+        }
+      }
+      return true;
+    }
+    
+    function mergePiece() {
+      const shape = currentPiece.shape;
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c]) {
+            if (currentPiece.y + r < 0) {
+              gameOverFlag = true;
+              return;
+            }
+            board[currentPiece.y + r][currentPiece.x + c] = currentPiece.color;
+          }
+        }
+      }
+    }
+    
+    function clearLines() {
+      let linesCleared = 0;
+      for (let r = ROWS - 1; r >= 0; r--) {
+        let isFull = true;
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c] === 0) { isFull = false; break; }
+        }
+        if (isFull) {
+          board.splice(r, 1);
+          board.unshift(new Array(COLS).fill(0));
+          linesCleared++;
+          r++;
+        }
+      }
+      score += linesCleared * 100;
+    }
+    
+    function newPiece() {
+      let index = floor(random(tetrominoes.length));
+      let piece = tetrominoes[index];
+      let startX = floor((COLS - piece.shape[0].length) / 2);
+      return {
+        shape: piece.shape,
+        x: startX,
+        y: -piece.shape.length,
+        color: piece.color,
+        name: piece.name
+      };
+    }
+    
+    function drawGrid() {
+      background(document.body.classList.contains("light-mode") ? 245 : color(24, 26, 27));
+      
+      stroke(document.body.classList.contains("light-mode") ? 200 : 48);
+      strokeWeight(1);
+      
+      for (let c = 0; c <= COLS; c++) {
+        let x = c * CELL_SIZE;
+        if (c === COLS) x = canvasWidth - 1;
+        line(x, 0, x, canvasHeight);
+      }
+      
+      for (let r = 0; r <= ROWS; r++) {
+        let y = r * CELL_SIZE;
+        if (r === ROWS) y = canvasHeight - 1;
+        line(0, y, canvasWidth, y);
+      }
+    }
+    
+    function setup() {
+      createCanvas(canvasWidth, canvasHeight).parent("game-container");
+      frameRate(60);
+      board = createBoard();
+      currentPiece = newPiece();
+      nextPiece = newPiece();
+      score = 0;
+      gameOverFlag = false;
+      lastDropTime = millis();
+      pixelDensity(1);
+      noSmooth();
+      drawGrid();
+      noLoop();
+      drawNextPiece();
+    }
+    
+    function draw() {
+      background(document.body.classList.contains("light-mode") ? 245 : color(24, 26, 27));
+      
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c] !== 0) {
+            noStroke();
+            fill(board[r][c]);
+            rect(
+              c * CELL_SIZE + BLOCK_OFFSET,
+              r * CELL_SIZE + BLOCK_OFFSET,
+              BLOCK_SIZE,
+              BLOCK_SIZE,
+              5
+            );
+          }
+        }
+      }
+      
+      stroke(document.body.classList.contains("light-mode") ? 200 : 48);
+      strokeWeight(1);
+      
+      for (let c = 0; c <= COLS; c++) {
+        let x = c * CELL_SIZE;
+        if (c === COLS) x = canvasWidth - 1;
+        line(x, 0, x, canvasHeight);
+      }
+      
+      for (let r = 0; r <= ROWS; r++) {
+        let y = r * CELL_SIZE;
+        if (r === ROWS) y = canvasHeight - 1;
+        line(0, y, canvasWidth, y);
+      }
+      
+      if (!gameOverFlag && (keyIsDown(DOWN_ARROW) || keyIsDown(83))) {
+        if (millis() - lastDropTime > dropInterval / 4) {
+          if (isValidPosition(currentPiece, 0, 1)) {
+            currentPiece.y++;
+          } else {
+            mergePiece();
+            clearLines();
+            currentPiece = nextPiece;
+            nextPiece = newPiece();
+            if (!isValidPosition(currentPiece, 0, 0)) {
+              gameOverFlag = true;
+              updateLastHighScore();
+            }
+          }
+          lastDropTime = millis();
+        }
+      } else if (!gameOverFlag && millis() - lastDropTime > dropInterval) {
+        if (isValidPosition(currentPiece, 0, 1)) {
+          currentPiece.y++;
+        } else {
+          mergePiece();
+          clearLines();
+          currentPiece = nextPiece;
+          nextPiece = newPiece();
+          if (!isValidPosition(currentPiece, 0, 0)) {
+            gameOverFlag = true;
+            updateLastHighScore();
+          }
+        }
+        lastDropTime = millis();
+      }
+      
+      drawPiece(currentPiece);
+      document.getElementById("score").innerText = score;
+      
+      if (gameOverFlag) {
+        push();
+        if (document.body.classList.contains("dark-mode")) {
+          fill(255,255,255,150);
+          var txtColor = 0;
+        } else {
+          fill(0,0,0,150);
+          var txtColor = 255;
+        }
+        rect(0, 0, canvasWidth, canvasHeight);
+        textAlign(CENTER, CENTER);
+        textSize(48);
+        fill(txtColor);
+        text("GAME OVER", canvasWidth / 2, canvasHeight / 2);
+        pop();
+        noLoop();
+      }
+      
+      drawNextPiece();
+    }
+    
+    function drawPiece(piece) {
+      const shape = piece.shape;
+      noStroke();
+      fill(piece.color);
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c]) {
+            rect(
+              (piece.x + c) * CELL_SIZE + BLOCK_OFFSET,
+              (piece.y + r) * CELL_SIZE + BLOCK_OFFSET,
+              BLOCK_SIZE,
+              BLOCK_SIZE,
+              5
+            );
+          }
+        }
+      }
+    }
+    
+    function drawNextPiece() {
+      let nextCanvas = document.getElementById("next-canvas");
+      if (nextCanvas) {
+        let ctx = nextCanvas.getContext("2d");
+        ctx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+        
+        ctx.fillStyle = document.body.classList.contains("light-mode") ? "rgb(245,245,245)" : "rgb(24,26,27)";
+        ctx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+        
+        let shape = nextPiece.shape;
+        let pieceCols = shape[0].length;
+        let pieceRows = shape.length;
+        let previewCell = CELL_SIZE;
+        let previewBlock = BLOCK_SIZE;
+        let offsetX = (nextCanvas.width - pieceCols * previewCell) / 2;
+        let offsetY = (nextCanvas.height - pieceRows * previewCell) / 2;
+        
+        for (let r = 0; r < pieceRows; r++) {
+          for (let c = 0; c < pieceCols; c++) {
+            if (shape[r][c]) {
+              ctx.fillStyle = nextPiece.color;
+              // Using roundRect without stroke
+              ctx.beginPath();
+              ctx.roundRect(
+                offsetX + c * previewCell + BLOCK_OFFSET,
+                offsetY + r * previewCell + BLOCK_OFFSET,
+                previewBlock,
+                previewBlock,
+                5
+              );
+              ctx.fill();
+            }
+          }
+        }
+      }
+    }
+    
+    function updateLastHighScore() {
+      lastScore = score;
+      document.getElementById("last-score").innerText = lastScore;
+      if (score > highScore) {
+        highScore = score;
+        document.getElementById("highest-score").innerText = highScore;
+      }
+    }
+    
+    function keyPressed() {
+      if (gameOverFlag) return;
+      if (key === 'r' || key === 'R') {
+        let rotated = rotatePiece(currentPiece);
+        if (isValidPosition({ ...currentPiece, shape: rotated }, 0, 0)) {
+          currentPiece.shape = rotated;
+        }
+      }
+      else if (keyCode === LEFT_ARROW || key === 'a' || key === 'A') {
+        if (isValidPosition(currentPiece, -1, 0)) {
+          currentPiece.x--;
+        }
+      }
+      else if (keyCode === RIGHT_ARROW || key === 'd' || key === 'D') {
+        if (isValidPosition(currentPiece, 1, 0)) {
+          currentPiece.x++;
+        }
+      }
+    }
+    
+    document.getElementById("start-btn").addEventListener("click", function() {
+      board = createBoard();
+      currentPiece = newPiece();
+      nextPiece = newPiece();
+      score = 0;
+      gameOverFlag = false;
+      lastDropTime = millis();
+      loop();
+      this.innerText = "Restart";
+    });
+    
+    document.getElementById("pause-btn").addEventListener("click", function() {
+      if (!gameOverFlag) {
+        if (isLooping()) {
+          noLoop();
+          this.innerText = "Unpause";
+        } else {
+          loop();
+          this.innerText = "Pause";
+        }
+      }
+    });
+    
+    document.getElementById("toggle-mode-btn").addEventListener("click", function() {
+      if (document.body.classList.contains("dark-mode")) {
+        document.body.classList.remove("dark-mode");
+        document.body.classList.add("light-mode");
+        this.innerHTML = sunIcon;
+      } else {
+        document.body.classList.remove("light-mode");
+        document.body.classList.add("dark-mode");
+        this.innerHTML = moonIcon;
+      }
+      if (isLooping()) {
+        redraw();
+      } else {
+        drawGrid();
+      }
+      drawNextPiece();
+    });
+  </script>
+</body>
+</html>
