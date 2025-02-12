@@ -142,7 +142,7 @@
       border-radius: 3px;
       border: 1px solid currentColor;
     }
-    
+
     /* Controls */
     .control-section {
       display: flex;
@@ -409,7 +409,7 @@
   // Touch handling variables
   let touchStartX = null;
   let touchStartY = null;
-  const MIN_SWIPE = 40;  // Increased threshold
+  const MIN_SWIPE = 40;  // Increased threshold to avoid accidental swipes
   
   // Game configuration
   const DESKTOP_GRID = 25;
@@ -446,8 +446,7 @@
     const canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.parent("game-container");
     setupPixelDensity();
-    // Mobile speed set to 9 FPS, desktop to 10
-    frameRate(isMobile ? 9 : 10);
+    frameRate(isMobile ? 8 : 10); // Mobile speed set to 8 FPS, desktop to 10
     initGame();
 
     if (isMobile) {
@@ -600,14 +599,12 @@
     
     move() {
       let newHead = p5.Vector.add(this.body[0], this.dir);
-      // Check wall collisions
       if (newHead.x < 0 || newHead.x >= canvasWidth || 
           newHead.y < 0 || newHead.y >= canvasHeight) {
         gameOver();
         return;
       }
       
-      // Check self collision
       for (let segment of this.body) {
         if (segment.equals(newHead)) {
           gameOver();
@@ -617,15 +614,14 @@
       
       this.body.unshift(newHead);
       
-      // Use grid-cell matching for food collision
-      if (floor(newHead.x / gridSize) === floor(food.x / gridSize) &&
-          floor(newHead.y / gridSize) === floor(food.y / gridSize)) {
+      // Check for food collision (using a half-grid threshold)
+      if (Math.abs(newHead.x - food.x) < gridSize / 2 && Math.abs(newHead.y - food.y) < gridSize / 2) {
         if (food.type === "apple") {
           score += 10;
-          this.growth = 1;  // Increase exactly 1 segment for red apple
+          this.growth = 1;  // Increase exactly 1 segment
         } else if (food.type === "goldenApple") {
           score += 30;
-          this.growth = 3;  // Increase exactly 3 segments for golden apple
+          this.growth = 3;  // Increase exactly 3 segments
         }
         updateScore();
         food = createFood();
