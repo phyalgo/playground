@@ -46,13 +46,14 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       overflow: hidden;
       background-color: inherit;
+      order: 1; /* Places game on left */
     }
     canvas {
       display: block;
       image-rendering: pixelated;
     }
     
-    /* Side Menu */
+    /* Side Menu - Now on right */
     .sidebar {
       width: 300px;
       height: 601px;
@@ -65,6 +66,7 @@
       flex-direction: column;
       justify-content: space-between;
       gap: 20px;
+      order: 2; /* Places menu on right */
     }
     
     /* Return to Playground Button */
@@ -99,24 +101,34 @@
     }
     
     /* Instructions */
-    .food-box {
+    .instructions-box {
       border: 2px solid currentColor;
       border-radius: 8px;
       padding: 10px;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
-    .food-box h3 {
+    .instructions-box h3 {
       text-align: center;
       margin-bottom: 10px;
     }
+    .instructions-box ol {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+    .instructions-box li {
+      margin-bottom: 5px;
+    }
+    .food-info {
+      border-top: 1px solid currentColor;
+      padding-top: 10px;
+      margin-top: 5px;
+    }
     .food-table {
-      margin: 0 auto;
-      border-collapse: collapse;
-      width: auto;
-      text-align: left;
+      width: 100%;
+      margin-top: 5px;
     }
     .food-table td {
-      padding: 5px 0;
+      padding: 3px 0;
     }
     .color-block {
       display: inline-block;
@@ -127,7 +139,7 @@
       border-radius: 3px;
       border: 1px solid currentColor;
     }
-    
+
     /* Controls */
     .control-section {
       display: flex;
@@ -173,32 +185,38 @@
     
     /* Light Mode adjustments */
     body.light-mode .score-box,
-    body.light-mode .food-box,
+    body.light-mode .instructions-box,
     body.light-mode .control-box,
     body.light-mode .theme-box,
     body.light-mode .return-box {
       border: 2px solid #000;
     }
 
+    /* Mobile Rules (show/hide based on device) */
+    .mobile-rules { display: none; }
+    .desktop-rules { display: block; }
+
     /* Mobile Responsive Layout */
     @media (max-width: 1000px) {
       .container {
         flex-direction: column;
-        padding: 10px;
-        gap: 20px;
+        padding: 5px;
+        gap: 10px;
         height: auto;
-        min-height: 100vh;
       }
 
       .sidebar {
-        width: 100%;
+        width: 98%;
         max-width: 600px;
         height: auto;
+        min-height: auto;
+        padding: 10px;
+        gap: 10px;
         order: 1;
       }
 
       #game-container {
-        width: 100%;
+        width: 98%;
         max-width: 600px;
         height: auto;
         aspect-ratio: 1;
@@ -212,48 +230,69 @@
 
       .score-section {
         flex-direction: row;
-        flex-wrap: wrap;
         justify-content: space-between;
+        gap: 5px;
       }
 
       .score-box {
         flex: 1;
-        min-width: 120px;
-      }
-    }
-
-    /* Small Mobile Devices */
-    @media (max-width: 480px) {
-      .container {
         padding: 5px;
       }
 
-      .sidebar {
-        padding: 10px;
+      .instructions-box {
+        padding: 8px;
       }
 
-      .score-section {
-        flex-direction: column;
-      }
+      .mobile-rules { display: block; }
+      .desktop-rules { display: none; }
 
       .control-section {
-        flex-direction: column;
-        gap: 10px;
+        gap: 5px;
       }
 
       .game-controls {
-        width: 100%;
-        justify-content: center;
+        gap: 5px;
       }
 
-      .theme-box {
-        margin-top: 10px;
+      .return-box {
+        margin-bottom: 5px;
+        padding: 5px;
+      }
+    }
+
+    /* Extra Small Devices */
+    @media (max-width: 480px) {
+      .container {
+        padding: 3px;
+      }
+
+      .sidebar {
+        padding: 8px;
+      }
+
+      .score-section {
+        gap: 3px;
+      }
+
+      .score-box h3 {
+        font-size: 0.9rem;
+      }
+
+      .instructions-box {
+        font-size: 0.8rem;
+      }
+
+      .control-box {
+        padding: 3px 8px;
       }
     }
   </style>
 </head>
 <body class="dark-mode">
   <div class="container">
+    <!-- Game Container -->
+    <div id="game-container"></div>
+    
     <!-- Side Menu -->
     <div class="sidebar">
       <!-- Return to Playground -->
@@ -278,22 +317,36 @@
       </div>
       
       <!-- Instructions -->
-      <div class="food-box">
+      <div class="instructions-box">
         <h3>Instructions:</h3>
-        <table class="food-table">
-          <tr>
-            <td>
-              <span class="color-block" style="background-color: #A94442;"></span>
-              Red Apple: 10 pts
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span class="color-block" style="background-color: #BFA06B;"></span>
-              Golden Apple: 30 pts
-            </td>
-          </tr>
-        </table>
+        <div class="desktop-rules">
+          <ol>
+            <li>Use WASD or arrow keys to move snake</li>
+            <li>Avoid hitting walls or yourself</li>
+          </ol>
+        </div>
+        <div class="mobile-rules">
+          <ol>
+            <li>Swipe to move snake</li>
+            <li>Avoid hitting walls or yourself</li>
+          </ol>
+        </div>
+        <div class="food-info">
+          <table class="food-table">
+            <tr>
+              <td>
+                <span class="color-block" style="background-color: #A94442;"></span>
+                Red Apple: 10 pts
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="color-block" style="background-color: #BFA06B;"></span>
+                Golden Apple: 30 pts
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       
       <!-- Controls -->
@@ -311,15 +364,19 @@
         </div>
       </div>
     </div>
-
-    <!-- Game Container -->
-    <div id="game-container"></div>
   </div>
 <script>
     // Theme toggle icons
     const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
     const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
     document.getElementById("toggle-mode-btn").innerHTML = moonIcon;
+    
+    // Check if device is mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // Show/hide appropriate instructions
+    document.querySelector('.mobile-rules').style.display = isMobile ? 'block' : 'none';
+    document.querySelector('.desktop-rules').style.display = isMobile ? 'none' : 'block';
     
     // Touch handling variables
     let touchStartX = null;
@@ -329,9 +386,18 @@
     // Game configuration
     const cols = 25;
     const rows = 25;
-    const gridSize = 600 / 25;
-    const canvasWidth = 600;
-    const canvasHeight = 600;
+    let gridSize = 600 / 25;
+    let canvasWidth = 600;
+    let canvasHeight = 600;
+    
+    // Adjust canvas size for mobile
+    if (isMobile) {
+      const gameContainer = document.getElementById('game-container');
+      const containerWidth = gameContainer.clientWidth;
+      canvasWidth = containerWidth - 4; // Account for border
+      canvasHeight = canvasWidth;
+      gridSize = canvasWidth / cols;
+    }
     
     // Game variables
     let snake;
@@ -353,11 +419,13 @@
       frameRate(10);
       initGame();
 
-      // Add touch event listeners
-      const canvasElement = document.querySelector("#game-container canvas");
-      canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-      canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-      canvasElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+      if (isMobile) {
+        // Add touch event listeners
+        const canvasElement = document.querySelector("#game-container canvas");
+        canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvasElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+      }
     }
 
     // Touch handlers
@@ -378,7 +446,7 @@
 
       if (Math.abs(deltaX) > MIN_SWIPE || Math.abs(deltaY) > MIN_SWIPE) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          // Horizontal swipe
+// Horizontal swipe
           if (deltaX > 0 && snake.dir.x === 0) {
             snake.dir.set(gridSize, 0); // Right
           } else if (deltaX < 0 && snake.dir.x === 0) {
