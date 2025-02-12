@@ -97,12 +97,13 @@
             margin-top: 80px; /* Proper spacing below theme toggle */
             pointer-events: none; /* Prevents interaction */
             transition: color 0.3s;
-        }
-        body.light-mode .watermark {
-            color: black; /* Black in Light Mode */
+            color: #000; /* Default to pure black */
         }
         body.dark-mode .watermark {
-            color: white; /* White in Dark Mode */
+            color: #fff !important; /* Pure white in Dark Mode */
+        }
+        body.light-mode .watermark {
+            color: #000 !important; /* Pure black in Light Mode */
         }
 
         /* Light mode adjustments */
@@ -130,7 +131,7 @@
         </div>
 
         <!-- Watermark (Properly Spaced Below Theme Toggle) -->
-        <div class="watermark">Made by Phy</div>
+        <div class="watermark" id="watermark">Made by Phy</div>
     </div>
 
     <script>
@@ -139,16 +140,16 @@
         const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
 
         const themeBtn = document.getElementById("toggle-mode-btn");
-        const watermark = document.querySelector(".watermark");
+        const watermark = document.getElementById("watermark");
 
         // Function to update theme icon and watermark color
         function updateTheme() {
             if (document.body.classList.contains("dark-mode")) {
                 themeBtn.innerHTML = moonIcon;
-                watermark.style.color = "white"; // White in Dark Mode
+                watermark.style.color = "#FFF"; // Pure white in Dark Mode
             } else {
                 themeBtn.innerHTML = sunIcon;
-                watermark.style.color = "black"; // Black in Light Mode
+                watermark.style.color = "#000"; // Pure black in Light Mode
             }
         }
         updateTheme();
