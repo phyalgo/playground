@@ -5,53 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playground</title>
     <style>
-        body {
-            font-family: monospace;
+        /* Global Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: monospace; transition: background 0.3s, color 0.3s; }
+
+        /* True Light/Dark Mode */
+        body.dark-mode {
             background-color: #181a1b;
-            color: #ffffff;
+            color: #fff;
+        }
+        body.light-mode {
+            background-color: #f5f5f5;
+            color: #000;
+        }
+
+        /* Centered Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             text-align: center;
-            padding: 50px;
         }
-        h1 {
-            color: #f5f5f5;
-        }
+
+        /* Title */
+        h1 { margin-bottom: 20px; font-size: 2rem; }
+
+        /* Floating Game Links */
         .game-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 280px;
+        }
+        .game-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid currentColor;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background-color: inherit;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .game-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* Controls Section */
+        .control-section {
+            display: flex;
+            justify-content: center;
             margin-top: 20px;
         }
-        .game-links a {
-            display: block;
-            font-size: 20px;
-            text-decoration: none;
-            color: white;
-            background: #007BFF;
-            padding: 12px;
-            margin: 10px auto;
-            width: 250px;
+
+        /* Light/Dark Mode Toggle */
+        .theme-box {
+            border: 2px solid currentColor;
             border-radius: 8px;
-            transition: background 0.3s;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
         }
-        .game-links a:hover {
-            background: #0056b3;
-        }
-        .footer {
-            margin-top: 50px;
-            font-size: 14px;
-            color: #888;
+
+        /* Light mode adjustments */
+        body.light-mode .game-card,
+        body.light-mode .theme-box {
+            border-color: #000;
         }
     </style>
 </head>
-<body>
-    <h1>🎮 Playground</h1>
-    <p>Select a game to play:</p>
-    
-    <div class="game-links">
-        <a href="snake.html">🐍 Play Snake</a>
-        <a href="tetris.html">🟦 Play Tetris</a>
-        <a href="2048.html">🔢 Play 2048</a>
+<body class="dark-mode">
+    <div class="container">
+        <h1>🎮 Playground</h1>
+        <p>Select a game to play:</p>
+        
+        <!-- Game Links -->
+        <div class="game-links">
+            <a href="snake.html" class="game-card">🐍 Play Snake</a>
+            <a href="tetris.html" class="game-card">🟦 Play Tetris</a>
+            <a href="2048.html" class="game-card">🔢 Play 2048</a>
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <div class="control-section">
+            <div class="theme-box" id="toggle-mode-btn"></div>
+        </div>
     </div>
 
-    <div class="footer">
-        <p>Created by <strong>Phy</strong> | Hosted on GitHub Pages</p>
-    </div>
+    <script>
+        // Define theme toggle icons
+        const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
+
+        const themeBtn = document.getElementById("toggle-mode-btn");
+
+        // Set initial mode
+        function updateThemeIcon() {
+            themeBtn.innerHTML = document.body.classList.contains("dark-mode") ? moonIcon : sunIcon;
+        }
+        updateThemeIcon();
+
+        // Toggle theme mode
+        themeBtn.addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
+            document.body.classList.toggle("light-mode");
+            updateThemeIcon();
+        });
+    </script>
 </body>
 </html>
