@@ -30,7 +30,16 @@
         }
 
         /* Title */
-        h1 { margin-bottom: 20px; font-size: 2rem; }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        /* Subtitle (Now properly spaced) */
+        p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
 
         /* Floating Game Links */
         .game-links {
@@ -63,7 +72,7 @@
         .control-section {
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 25px; /* Extra space between links and toggle */
         }
 
         /* Light/Dark Mode Toggle */
@@ -88,14 +97,14 @@
 </head>
 <body class="dark-mode">
     <div class="container">
-        <h1>🎮 Playground</h1>
+        <h1>Playground</h1>
         <p>Select a game to play:</p>
         
         <!-- Game Links -->
         <div class="game-links">
-            <a href="snake.html" class="game-card">🐍 Play Snake</a>
-            <a href="tetris.html" class="game-card">🟦 Play Tetris</a>
-            <a href="2048.html" class="game-card">🔢 Play 2048</a>
+            <a href="snake.html" class="game-card">Play Snake</a>
+            <a href="tetris.html" class="game-card">Play Tetris</a>
+            <a href="2048.html" class="game-card">Play 2048</a>
         </div>
 
         <!-- Theme Toggle Button -->
