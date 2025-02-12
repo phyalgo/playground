@@ -10,13 +10,13 @@
         html, body { height: 100%; font-family: monospace; transition: background 0.3s, color 0.3s; }
 
         /* True Light/Dark Mode */
-        body.dark-mode {
-            background-color: #181a1b;
-            color: #fff;
-        }
         body.light-mode {
             background-color: #f5f5f5;
             color: #000;
+        }
+        body.dark-mode {
+            background-color: #181a1b;
+            color: #fff;
         }
 
         /* Centered Container */
@@ -35,7 +35,7 @@
             font-size: 2rem;
         }
 
-        /* Subtitle (Now properly spaced) */
+        /* Subtitle */
         p {
             margin-bottom: 20px;
             font-size: 1.2rem;
@@ -64,7 +64,7 @@
             transition: background 0.3s, transform 0.2s;
         }
         .game-card:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.1);
             transform: scale(1.05);
         }
 
@@ -72,7 +72,7 @@
         .control-section {
             display: flex;
             justify-content: center;
-            margin-top: 25px; /* Extra space between links and toggle */
+            margin-top: 25px;
         }
 
         /* Light/Dark Mode Toggle */
@@ -95,7 +95,7 @@
         }
     </style>
 </head>
-<body class="dark-mode">
+<body class="light-mode"> <!-- Light mode is now default -->
     <div class="container">
         <h1>Playground</h1>
         <p>Select a game to play:</p>
@@ -120,7 +120,7 @@
 
         const themeBtn = document.getElementById("toggle-mode-btn");
 
-        // Set initial mode
+        // Function to update theme icon based on current mode
         function updateThemeIcon() {
             themeBtn.innerHTML = document.body.classList.contains("dark-mode") ? moonIcon : sunIcon;
         }
