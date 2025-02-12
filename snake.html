@@ -142,7 +142,7 @@
       border-radius: 3px;
       border: 1px solid currentColor;
     }
-
+    
     /* Controls */
     .control-section {
       display: flex;
@@ -409,24 +409,25 @@
   // Touch handling variables
   let touchStartX = null;
   let touchStartY = null;
-  const MIN_SWIPE = 40;  // Increased threshold to avoid accidental swipes
+  const MIN_SWIPE = 40;  // Increased threshold
   
   // Game configuration
   const DESKTOP_GRID = 25;
   const MOBILE_GRID = 15;
   const cols = isMobile ? MOBILE_GRID : DESKTOP_GRID;
   const rows = isMobile ? MOBILE_GRID : DESKTOP_GRID;
-  let gridSize = 600 / (isMobile ? MOBILE_GRID : DESKTOP_GRID);
+  
+  // Use Math.floor to obtain an integer grid size (helps with collision detection)
+  let gridSize = Math.floor(600 / (isMobile ? MOBILE_GRID : DESKTOP_GRID));
   let canvasWidth = 600;
   let canvasHeight = 600;
   
   // Adjust canvas size for mobile
   if (isMobile) {
     const gameContainer = document.getElementById('game-container');
-    const containerWidth = gameContainer.clientWidth;
-    canvasWidth = containerWidth - 4; // Account for border
+    canvasWidth = gameContainer.clientWidth - 4; // Account for border
     canvasHeight = canvasWidth;
-    gridSize = canvasWidth / MOBILE_GRID;
+    gridSize = Math.floor(canvasWidth / MOBILE_GRID);
   }
   
   // Game variables
@@ -446,7 +447,8 @@
     const canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.parent("game-container");
     setupPixelDensity();
-    frameRate(isMobile ? 8 : 10); // Mobile speed set to 8 FPS, desktop to 10
+    // Mobile speed set to 9 FPS, desktop to 10
+    frameRate(isMobile ? 9 : 10);
     initGame();
 
     if (isMobile) {
@@ -580,17 +582,33 @@
     document.getElementById("pause-btn").innerText = "Pause";
   }
   
+  // Create food ensuring it does NOT spawn on any snake segment
   function createFood() {
-    // Reduce golden apple frequency to ~2% chance (about 1 golden apple per 50 red apples)
+    let foodX, foodY, valid;
+    do {
+      foodX = floor(random(cols)) * gridSize;
+      foodY = floor(random(rows)) * gridSize;
+      valid = true;
+      if (snake) {
+        for (let segment of snake.body) {
+          if (floor(segment.x / gridSize) === floor(foodX / gridSize) &&
+              floor(segment.y / gridSize) === floor(foodY / gridSize)) {
+            valid = false;
+            break;
+          }
+        }
+      }
+    } while (!valid);
+    
+    // Golden apple chance: ~2% (about 1 in 50)
     let rand = random();
     let type = (rand < 0.98) ? "apple" : "goldenApple";
-    let foodX = floor(random(cols)) * gridSize;
-    let foodY = floor(random(rows)) * gridSize;
     return { x: foodX, y: foodY, type: type };
   }
   
   class Snake {
     constructor() {
+      // Start in the center of the canvas (aligned to grid)
       this.body = [createVector(floor(canvasWidth / (2 * gridSize)) * gridSize, 
                                 floor(canvasHeight / (2 * gridSize)) * gridSize)];
       this.dir = createVector(gridSize, 0);
@@ -599,12 +617,14 @@
     
     move() {
       let newHead = p5.Vector.add(this.body[0], this.dir);
+      // Check wall collisions
       if (newHead.x < 0 || newHead.x >= canvasWidth || 
           newHead.y < 0 || newHead.y >= canvasHeight) {
         gameOver();
         return;
       }
       
+      // Check self collision
       for (let segment of this.body) {
         if (segment.equals(newHead)) {
           gameOver();
@@ -614,14 +634,15 @@
       
       this.body.unshift(newHead);
       
-      // Check for food collision (using a half-grid threshold)
-      if (Math.abs(newHead.x - food.x) < gridSize / 2 && Math.abs(newHead.y - food.y) < gridSize / 2) {
+      // Use discrete cell comparison for food collision
+      if (floor(newHead.x / gridSize) === floor(food.x / gridSize) &&
+          floor(newHead.y / gridSize) === floor(food.y / gridSize)) {
         if (food.type === "apple") {
           score += 10;
-          this.growth = 1;  // Increase exactly 1 segment
+          this.growth = 1;  // Increase exactly 1 segment for red apple
         } else if (food.type === "goldenApple") {
           score += 30;
-          this.growth = 3;  // Increase exactly 3 segments
+          this.growth = 3;  // Increase exactly 3 segments for golden apple
         }
         updateScore();
         food = createFood();
