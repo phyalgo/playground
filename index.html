@@ -1,179 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Playground</title>
-  <!-- p5.js Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
-  <style>
-    /* Global Reset */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; font-family: monospace; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playground</title>
+    <style>
+        /* Global Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: monospace; transition: background 0.3s, color 0.3s; }
 
-    /* Light/Dark Mode */
-    body.light-mode { background-color: #f5f5f5; color: #000; }
-    body.dark-mode { background-color: #181a1b; color: #fff; }
+        /* True Light/Dark Mode */
+        body.light-mode {
+            background-color: #f5f5f5;
+            color: #000;
+        }
+        body.dark-mode {
+            background-color: #181a1b;
+            color: #fff;
+        }
 
-    /* Main Container */
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 40px;
-      width: 100vw;
-      height: 100vh;
-    }
+        /* Centered Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
 
-    /* Sidebar */
-    .sidebar {
-      width: 300px;
-      height: 601px;
-      padding: 20px;
-      border: 2px solid currentColor;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      background-color: inherit;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 20px;
-    }
+        /* Title */
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
 
-    /* Score Section */
-    .score-section { display: flex; flex-direction: column; gap: 10px; }
-    .score-box {
-      border: 2px solid currentColor;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      font-size: 1rem;
-    }
+        /* Subtitle */
+        p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
 
-    /* Food Types */
-    .food-box {
-      border: 2px solid currentColor;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 1rem;
-    }
-    .food-box h3 { text-align: center; margin-bottom: 10px; }
-    .food-table { margin: 0 auto; width: auto; text-align: left; }
-    .food-table td { padding: 5px 0; }
-    .color-block {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-right: 8px;
-      vertical-align: middle;
-      border-radius: 3px;
-      border: 1px solid currentColor;
-    }
+        /* Floating Game Links */
+        .game-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 280px;
+        }
+        .game-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid currentColor;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background-color: inherit;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .game-card:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.05);
+        }
 
-    /* Controls */
-    .control-section { display: flex; justify-content: space-between; align-items: center; }
-    .game-controls { display: flex; gap: 10px; }
-    .control-box {
-      border: 2px solid currentColor;
-      border-radius: 8px;
-      padding: 5px 10px;
-      text-align: center;
-      font-size: 1rem;
-    }
-    .control-box button {
-      background: none;
-      border: none;
-      font-family: inherit;
-      font-size: inherit;
-      color: inherit;
-      cursor: pointer;
-    }
+        /* Controls Section */
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 25px;
+        }
 
-    /* Watermark */
-    .watermark {
-      text-align: center;
-      font-size: 0.9rem;
-      opacity: 0.6;  /* Subtle transparency */
-      margin-top: 30px;  /* Space below the theme toggle */
-      color: inherit;
-      pointer-events: none; /* Prevent interactions */
-    }
-  </style>
+        /* Light/Dark Mode Toggle */
+        .theme-box {
+            border: 2px solid currentColor;
+            border-radius: 8px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* Watermark */
+        .watermark {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-top: 15px; /* Space below theme toggle */
+            color: inherit;
+            pointer-events: none; /* Prevents interaction */
+        }
+
+        /* Light mode adjustments */
+        body.light-mode .game-card,
+        body.light-mode .theme-box {
+            border-color: #000;
+        }
+    </style>
 </head>
-<body class="light-mode">
-
-  <!-- Game List Menu -->
-  <div class="container" id="game-list">
-      <h1>Playground</h1>
-      <p>Select a game to play:</p>
-      <div class="game-list">
-          <button class="control-box" onclick="showGame('snake')">Play Snake</button>
-          <button class="control-box" onclick="showGame('tetris')">Play Tetris</button>
-          <button class="control-box" onclick="showGame('2048')">Play 2048</button>
-      </div>
-  </div>
-
-  <!-- Game Section -->
-  <div class="container" id="game-container" style="display: none;">
-    <div id="game"></div>
-    <div class="sidebar">
-      <div class="score-section">
-        <div class="score-box"><h3>Score</h3><p id="score">0</p></div>
-        <div class="score-box"><h3>Last Score</h3><p id="last-score">0</p></div>
-        <div class="score-box"><h3>Highest Score</h3><p id="highest-score">0</p></div>
-      </div>
-
-      <div class="food-box">
-        <h3>Food Types</h3>
-        <table class="food-table">
-          <tr>
-            <td><span class="color-block" style="background-color: #A94442;"></span> Red Apple: 10 pts</td>
-          </tr>
-          <tr>
-            <td><span class="color-block" style="background-color: #BFA06B;"></span> Golden Apple: 30 pts</td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="control-section">
-        <div class="game-controls">
-          <div class="control-box"><button id="start-btn">Start</button></div>
-          <div class="control-box"><button id="pause-btn">Pause</button></div>
+<body class="light-mode"> <!-- Light mode is now default -->
+    <div class="container">
+        <h1>Playground</h1>
+        <p>Select a game to play:</p>
+        
+        <!-- Game Links -->
+        <div class="game-links">
+            <a href="snake.html" class="game-card">Play Snake</a>
+            <a href="tetris.html" class="game-card">Play Tetris</a>
+            <a href="2048.html" class="game-card">Play 2048</a>
         </div>
-      </div>
 
-      <!-- Return to Game List Button -->
-      <div class="control-section">
-        <div class="control-box">
-          <button id="return-btn" class="return-button">← Return to Game List</button>
+        <!-- Theme Toggle Button -->
+        <div class="control-section">
+            <div class="theme-box" id="toggle-mode-btn"></div>
+            <!-- Watermark -->
+            <div class="watermark">Made with ❤️ by Phy</div>
         </div>
-      </div>
-
-      <!-- Watermark -->
-      <div class="watermark">Phy made it</div>
     </div>
-  </div>
 
-  <script>
-    function showGame(game) {
-      document.getElementById("game-list").style.display = "none";
-      document.getElementById("game-container").style.display = "flex";
-      if (game === "snake") {
-        loadSnakeGame();
-      }
-    }
+    <script>
+        // Define theme toggle icons
+        const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
 
-    function returnToMenu() {
-      document.getElementById("game-container").style.display = "none";
-      document.getElementById("game-list").style.display = "flex";
-    }
+        const themeBtn = document.getElementById("toggle-mode-btn");
 
-    document.getElementById("return-btn").addEventListener("click", returnToMenu);
+        // Function to update theme icon based on current mode
+        function updateThemeIcon() {
+            themeBtn.innerHTML = document.body.classList.contains("dark-mode") ? moonIcon : sunIcon;
+        }
+        updateThemeIcon();
 
-    function loadSnakeGame() {
-      console.log("Snake Game Loaded!");
-      // You would add the actual snake game logic here.
-    }
-  </script>
+        // Toggle theme mode
+        themeBtn.addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
+            document.body.classList.toggle("light-mode");
+            updateThemeIcon();
+        });
+    </script>
 </body>
 </html>
