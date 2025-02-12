@@ -8,19 +8,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
   <style>
     /* Global Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      font-family: monospace;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      height: 100%; 
+      font-family: monospace; 
+      overscroll-behavior: contain;
+      touch-action: none;
     }
     
-    /* True Light/Dark Mode:
-       Dark mode: dark background with white text and borders.
-       Light mode: light background with black text and borders. */
+    /* Light/Dark Themes */
     body.dark-mode {
       background-color: #181a1b;
       color: #fff;
@@ -30,17 +26,18 @@
       color: #000;
     }
     
-    /* Main Container: centers the game container and side menu side by side */
+    /* Main Container */
     .container {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 40px; /* even margin between containers */
+      gap: 40px;
       width: 100vw;
       height: 100vh;
+      padding: 20px;
     }
     
-    /* Game Container (Floating Card) – fixed at 601×601 */
+    /* Game Container */
     #game-container {
       width: 601px;
       height: 601px;
@@ -50,13 +47,12 @@
       overflow: hidden;
       background-color: inherit;
     }
-    /* The canvas fills the game container exactly; pixelated rendering ensures crispness */
     canvas {
       display: block;
       image-rendering: pixelated;
     }
     
-    /* Side Menu (Floating Card) – fixed at 300×601 to match the game container’s height */
+    /* Side Menu */
     .sidebar {
       width: 300px;
       height: 601px;
@@ -71,7 +67,24 @@
       gap: 20px;
     }
     
-    /* --- Top Section: Score Boxes (Stacked) --- */
+    /* Return to Playground Button */
+    .return-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .return-box a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Score Boxes */
     .score-section {
       display: flex;
       flex-direction: column;
@@ -85,7 +98,7 @@
       font-size: 1rem;
     }
     
-    /* --- Middle Section: Food Types --- */
+    /* Instructions */
     .food-box {
       border: 2px solid currentColor;
       border-radius: 8px;
@@ -96,10 +109,6 @@
       text-align: center;
       margin-bottom: 10px;
     }
-    /* Using a table to control alignment:
-       - The table is centered in the food box.
-       - The red apple row appears above the golden apple row.
-       - Both rows’ text is left-aligned within the table cell. */
     .food-table {
       margin: 0 auto;
       border-collapse: collapse;
@@ -119,7 +128,7 @@
       border: 1px solid currentColor;
     }
     
-    /* --- Bottom Section: Controls --- */
+    /* Controls */
     .control-section {
       display: flex;
       justify-content: space-between;
@@ -144,7 +153,7 @@
       color: inherit;
       cursor: pointer;
     }
-    /* Theme Toggle: Separate boxed button */
+    /* Theme Toggle */
     .theme-box {
       border: 2px solid currentColor;
       border-radius: 8px;
@@ -162,23 +171,97 @@
       color: inherit;
     }
     
-    /* In Light Mode, force borders and text to black */
+    /* Light Mode adjustments */
     body.light-mode .score-box,
     body.light-mode .food-box,
     body.light-mode .control-box,
-    body.light-mode .theme-box {
+    body.light-mode .theme-box,
+    body.light-mode .return-box {
       border: 2px solid #000;
+    }
+
+    /* Mobile Responsive Layout */
+    @media (max-width: 1000px) {
+      .container {
+        flex-direction: column;
+        padding: 10px;
+        gap: 20px;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        order: 1;
+      }
+
+      #game-container {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        aspect-ratio: 1;
+        order: 2;
+      }
+
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .score-section {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .score-box {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+
+    /* Small Mobile Devices */
+    @media (max-width: 480px) {
+      .container {
+        padding: 5px;
+      }
+
+      .sidebar {
+        padding: 10px;
+      }
+
+      .score-section {
+        flex-direction: column;
+      }
+
+      .control-section {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .game-controls {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .theme-box {
+        margin-top: 10px;
+      }
     }
   </style>
 </head>
-<body class="light-mode">
+<body class="dark-mode">
   <div class="container">
-    <!-- Game Container -->
-    <div id="game-container"></div>
-    
     <!-- Side Menu -->
     <div class="sidebar">
-      <!-- Top Section: Score Boxes -->
+      <!-- Return to Playground -->
+      <div class="return-box">
+        <a href="https://phyalgo.github.io/playground/">Return to Playground</a>
+      </div>
+
+      <!-- Score Boxes -->
       <div class="score-section">
         <div class="score-box" id="score-box">
           <h3>Score</h3>
@@ -189,14 +272,14 @@
           <p id="last-score">0</p>
         </div>
         <div class="score-box" id="highest-score-box">
-          <h3>Highest Score</h3>
+          <h3>High Score</h3>
           <p id="highest-score">0</p>
         </div>
       </div>
       
-      <!-- Middle Section: Food Types -->
+      <!-- Instructions -->
       <div class="food-box">
-        <h3>Food Types</h3>
+        <h3>Instructions:</h3>
         <table class="food-table">
           <tr>
             <td>
@@ -213,7 +296,7 @@
         </table>
       </div>
       
-      <!-- Bottom Section: Controls -->
+      <!-- Controls -->
       <div class="control-section">
         <div class="game-controls">
           <div class="control-box">
@@ -228,95 +311,151 @@
         </div>
       </div>
     </div>
+
+    <!-- Game Container -->
+    <div id="game-container"></div>
   </div>
-  
-  <script>
-    // Ensure crisp, unblurred rendering.
+<script>
+    // Theme toggle icons
+    const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
+    document.getElementById("toggle-mode-btn").innerHTML = moonIcon;
+    
+    // Touch handling variables
+    let touchStartX = null;
+    let touchStartY = null;
+    const MIN_SWIPE = 30;
+    
+    // Game configuration
+    const cols = 25;
+    const rows = 25;
+    const gridSize = 600 / 25;
+    const canvasWidth = 600;
+    const canvasHeight = 600;
+    
+    // Game variables
+    let snake;
+    let food;
+    let score = 0;
+    let lastScore = 0;
+    let highScore = 0;
+    let gameState = "stopped";
+    
     function setupPixelDensity() {
       pixelDensity(1);
       noSmooth();
     }
     
-    // Define theme toggle icons using currentColor.
-    const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
-    const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
-    // Set the initial toggle icon (in dark mode, currentColor is white).
-    document.getElementById("toggle-mode-btn").innerHTML = sunIcon;
-    
-    // We want a 25×25 grid inside a 600×600 container.
-    // Each cell is 600/25 = 24px.
-    const cols = 25;
-    const rows = 25;
-    const gridSize = 600 / 25; // 24px per cell
-    const canvasWidth = 600;  // game container is 600px wide
-    const canvasHeight = 600; // game container is 600px high
-    
-    let snake;
-    let food;
-    let score = 0;
-    let lastScore = 0;
-    let highestScore = 0;
-    let gameState = "stopped"; // "stopped", "running", "paused", "gameover"
-    
     function setup() {
-      setupPixelDensity();
-      canvas = createCanvas(canvasWidth, canvasHeight);
+      const canvas = createCanvas(canvasWidth, canvasHeight);
       canvas.parent("game-container");
+      setupPixelDensity();
       frameRate(10);
       initGame();
+
+      // Add touch event listeners
+      const canvasElement = document.querySelector("#game-container canvas");
+      canvasElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+      canvasElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvasElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+    }
+
+    // Touch handlers
+    function handleTouchStart(evt) {
+      evt.preventDefault();
+      const touch = evt.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }
+
+    function handleTouchMove(evt) {
+      evt.preventDefault();
+      if (!touchStartX || !touchStartY || gameState !== "running") return;
+
+      const touch = evt.touches[0];
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+
+      if (Math.abs(deltaX) > MIN_SWIPE || Math.abs(deltaY) > MIN_SWIPE) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          // Horizontal swipe
+          if (deltaX > 0 && snake.dir.x === 0) {
+            snake.dir.set(gridSize, 0); // Right
+          } else if (deltaX < 0 && snake.dir.x === 0) {
+            snake.dir.set(-gridSize, 0); // Left
+          }
+        } else {
+          // Vertical swipe
+          if (deltaY > 0 && snake.dir.y === 0) {
+            snake.dir.set(0, gridSize); // Down
+          } else if (deltaY < 0 && snake.dir.y === 0) {
+            snake.dir.set(0, -gridSize); // Up
+          }
+        }
+        touchStartX = null;
+        touchStartY = null;
+      }
+    }
+
+    function handleTouchEnd(evt) {
+      evt.preventDefault();
+      touchStartX = null;
+      touchStartY = null;
     }
     
     function draw() {
-      // Set background based on current theme.
+      // Set background based on theme
       if (document.body.classList.contains("light-mode")) {
         background(245);
       } else {
         background(24, 26, 27);
       }
       
-      // Draw vertical grid lines.
+      // Draw grid lines
       if (document.body.classList.contains("light-mode")) {
         stroke(200);
       } else {
         stroke(48, 51, 54);
       }
+      
+      // Draw vertical lines
       for (let i = 0; i <= cols; i++) {
         let x = i * gridSize;
-        // Ensure the rightmost line is drawn at x = 600 - 1
         if (i === cols) x = canvasWidth - 1;
         line(x, 0, x, canvasHeight);
       }
-      // Draw horizontal grid lines.
+      
+      // Draw horizontal lines
       for (let j = 0; j <= rows; j++) {
         let y = j * gridSize;
         if (j === rows) y = canvasHeight - 1;
         line(0, y, canvasWidth, y);
       }
       
-      // Draw food.
+      // Draw food
       if (food.type === "apple") {
         drawApple(food.x, food.y);
       } else if (food.type === "goldenApple") {
         drawGoldenApple(food.x, food.y);
       }
       
-      // Update snake if game is running.
+      // Update and show snake
       if (gameState === "running") {
         snake.move();
       }
       snake.show();
       
-      // Update current score in the side menu.
+      // Update score display
       document.getElementById("score").innerText = score;
       
-      // If game over, overlay a theme-based "GAME OVER" message.
+      // Game over overlay
       if (gameState === "gameover") {
         push();
         if (document.body.classList.contains("dark-mode")) {
-          fill(255, 255, 255, 150); // semi-transparent white
+          fill(255, 255, 255, 150);
           var textFill = 0;
         } else {
-          fill(0, 0, 0, 150);       // semi-transparent black
+          fill(0, 0, 0, 150);
           var textFill = 255;
         }
         rect(0, 0, canvasWidth, canvasHeight);
@@ -348,22 +487,27 @@
     
     class Snake {
       constructor() {
-        this.body = [createVector(floor(canvasWidth / (2 * gridSize)) * gridSize, floor(canvasHeight / (2 * gridSize)) * gridSize)];
+        this.body = [createVector(floor(canvasWidth / (2 * gridSize)) * gridSize, 
+                                floor(canvasHeight / (2 * gridSize)) * gridSize)];
         this.dir = createVector(gridSize, 0);
         this.growth = 0;
       }
+      
       move() {
         let newHead = p5.Vector.add(this.body[0], this.dir);
-        if (newHead.x < 0 || newHead.x >= canvasWidth || newHead.y < 0 || newHead.y >= canvasHeight) {
+        if (newHead.x < 0 || newHead.x >= canvasWidth || 
+            newHead.y < 0 || newHead.y >= canvasHeight) {
           gameOver();
           return;
         }
+        
         for (let segment of this.body) {
           if (segment.equals(newHead)) {
             gameOver();
             return;
           }
         }
+        
         this.body.unshift(newHead);
         if (newHead.x === food.x && newHead.y === food.y) {
           if (food.type === "apple") {
@@ -376,14 +520,16 @@
           updateScore();
           food = createFood();
         }
+        
         if (this.growth > 0) {
           this.growth--;
         } else {
           this.body.pop();
         }
       }
+      
       show() {
-        fill("#3C4F65"); // Dark grey-blue.
+        fill("#3C4F65");
         noStroke();
         for (let segment of this.body) {
           rect(segment.x, segment.y, gridSize, gridSize, 5);
@@ -392,13 +538,13 @@
     }
     
     function drawApple(x, y) {
-      fill("#A94442"); // Dark, muted red.
+      fill("#A94442");
       noStroke();
       rect(x, y, gridSize, gridSize, 5);
     }
     
     function drawGoldenApple(x, y) {
-      fill("#BFA06B"); // Darker, greyish yellow.
+      fill("#BFA06B");
       noStroke();
       rect(x, y, gridSize, gridSize, 5);
     }
@@ -411,14 +557,16 @@
       gameState = "gameover";
       lastScore = score;
       document.getElementById("last-score").innerText = lastScore;
-      if (score > highestScore) {
-        highestScore = score;
-        document.getElementById("highest-score").innerText = highestScore;
+      if (score > highScore) {
+        highScore = score;
+        document.getElementById("highest-score").innerText = highScore;
       }
       document.getElementById("start-btn").innerText = "Start";
     }
     
     function keyPressed() {
+      if (gameState !== "running") return;
+      
       if ((keyCode === UP_ARROW || key === 'w' || key === 'W') && snake.dir.y === 0) {
         snake.dir.set(0, -gridSize);
       } else if ((keyCode === DOWN_ARROW || key === 's' || key === 'S') && snake.dir.y === 0) {
@@ -430,16 +578,21 @@
       }
     }
     
+    // Prevent arrow key scrolling
     window.addEventListener("keydown", function(e) {
-      if ([37,38,39,40].includes(e.keyCode)) { e.preventDefault(); }
+      if([37, 38, 39, 40].includes(e.keyCode)) {
+        e.preventDefault();
+      }
     });
     
+    // Start/Restart button
     document.getElementById("start-btn").addEventListener("click", function() {
       initGame();
       gameState = "running";
       this.innerText = "Restart";
     });
     
+    // Pause button
     document.getElementById("pause-btn").addEventListener("click", function() {
       if (gameState === "running") {
         gameState = "paused";
@@ -450,6 +603,7 @@
       }
     });
     
+    // Theme toggle
     document.getElementById("toggle-mode-btn").addEventListener("click", function() {
       if (document.body.classList.contains("dark-mode")) {
         document.body.classList.remove("dark-mode");
