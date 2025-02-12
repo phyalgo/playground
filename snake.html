@@ -142,7 +142,7 @@
       border-radius: 3px;
       border: 1px solid currentColor;
     }
-    
+
     /* Controls */
     .control-section {
       display: flex;
@@ -409,7 +409,7 @@
   // Touch handling variables
   let touchStartX = null;
   let touchStartY = null;
-  const MIN_SWIPE = 30;
+  const MIN_SWIPE = 40;  // Increased threshold to avoid accidental swipes
   
   // Game configuration
   const DESKTOP_GRID = 25;
@@ -446,7 +446,7 @@
     const canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.parent("game-container");
     setupPixelDensity();
-    frameRate(isMobile ? 8 : 10); // Mobile speed set to 8, desktop to 10
+    frameRate(isMobile ? 8 : 10); // Mobile speed set to 8 FPS, desktop to 10
     initGame();
 
     if (isMobile) {
@@ -470,6 +470,7 @@
     evt.preventDefault();
     evt.stopPropagation();
     
+    // Only proceed if we have valid starting touch coordinates and the game is running
     if (touchStartX === null || touchStartY === null || gameState !== "running") return;
 
     const touch = evt.touches[0];
@@ -479,23 +480,23 @@
     // Only handle swipe if it's significant enough
     if (Math.abs(deltaX) > MIN_SWIPE || Math.abs(deltaY) > MIN_SWIPE) {
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe - only if not moving vertically
+        // Horizontal swipe - only if not moving horizontally already
         if (deltaX > 0 && snake.dir.x === 0) {
-          snake.dir.set(gridSize, 0); // Right
+          snake.dir.set(gridSize, 0); // Swipe right
         } else if (deltaX < 0 && snake.dir.x === 0) {
-          snake.dir.set(-gridSize, 0); // Left
+          snake.dir.set(-gridSize, 0); // Swipe left
         }
       } else {
-        // Vertical swipe - only if not moving horizontally
+        // Vertical swipe - only if not moving vertically already
         if (deltaY > 0 && snake.dir.y === 0) {
-          snake.dir.set(0, gridSize); // Down
+          snake.dir.set(0, gridSize); // Swipe down
         } else if (deltaY < 0 && snake.dir.y === 0) {
-          snake.dir.set(0, -gridSize); // Up
+          snake.dir.set(0, -gridSize); // Swipe up
         }
       }
-      // Reset touch points after a successful swipe
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
+      // Clear the touch start coordinates so only one swipe is registered per touch
+      touchStartX = null;
+      touchStartY = null;
     }
   }
 
@@ -580,8 +581,9 @@
   }
   
   function createFood() {
+    // Reduce golden apple frequency to ~2% chance (about 1 golden apple per 50 red apples)
     let rand = random();
-    let type = (rand < 0.7) ? "apple" : "goldenApple";
+    let type = (rand < 0.98) ? "apple" : "goldenApple";
     let foodX = floor(random(cols)) * gridSize;
     let foodY = floor(random(rows)) * gridSize;
     return { x: foodX, y: foodY, type: type };
@@ -613,7 +615,7 @@
       this.body.unshift(newHead);
       
       // Check for food collision (using a half-grid threshold)
-      if (Math.abs(newHead.x - food.x) < gridSize/2 && Math.abs(newHead.y - food.y) < gridSize/2) {
+      if (Math.abs(newHead.x - food.x) < gridSize / 2 && Math.abs(newHead.y - food.y) < gridSize / 2) {
         if (food.type === "apple") {
           score += 10;
           this.growth = 1;  // Increase exactly 1 segment
@@ -682,7 +684,7 @@
   
   // Prevent arrow key scrolling
   window.addEventListener("keydown", function(e) {
-    if([37, 38, 39, 40].includes(e.keyCode)) {
+    if ([37, 38, 39, 40].includes(e.keyCode)) {
       e.preventDefault();
     }
   });
