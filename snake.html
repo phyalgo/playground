@@ -72,7 +72,7 @@
       background-color: inherit;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
       order: 2;
     }
     /* Uniform Heading Style */
@@ -94,8 +94,8 @@
     }
     /* Instructions & Food Containers */
     .instructions-box {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       flex: 1 1 auto;
       min-height: 0;
@@ -113,11 +113,23 @@
       flex: 0 1 auto;
       min-height: 0;
     }
-    .instructions-container ol { margin-left: 20px; }
-    .instructions-container li { margin-bottom: 5px; }
+    .instructions-container ol {
+      margin-left: 0;
+      padding-left: 20px;
+      list-style-position: outside;
+    }
+    .instructions-container li {
+      margin-bottom: 5px;
+      padding-left: 5px;
+    }
+    .food-table {
+      width: 100%;
+    }
     .food-table td {
       font-size: 1rem;
       padding: 3px 0;
+      white-space: nowrap;
+      padding-right: 10px;
     }
     .color-block {
       display: inline-block;
@@ -132,10 +144,10 @@
     /* Control section */
     .control-section {
       margin-top: auto;
-      padding-top: 10px;
+      padding-top: 0;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 10px;
     }
     
     .top-controls {
@@ -233,12 +245,12 @@
         max-width: 600px;
         height: auto;
         padding: 8px;
-        gap: 5px;
+        gap: 10px;
         order: 1;
       }
       .score-section {
         flex-direction: row;
-        gap: 3px;
+        gap: 10px;
       }
       .score-box {
         padding: 3px;
@@ -256,11 +268,18 @@
         height: 100% !important;
       }
       .instructions-box { 
-        flex-direction: row; 
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
       }
-      .instructions-container,
-      .food-container { 
-        width: 50%; 
+      .food-container {
+        padding: 10px 5px;
+      }
+      .food-table td {
+        white-space: normal;
+      }
+      .color-block {
+        margin-right: 4px;
       }
       .sidebar, .sidebar * { 
         font-size: 1rem !important; 
@@ -270,7 +289,7 @@
     
     @media (max-height: 700px) {
       .container { gap: 3px; }
-      .sidebar { padding: 5px; gap: 3px; }
+      .sidebar { padding: 5px; gap: 10px; }
     }
   </style>
 </head>
@@ -352,7 +371,7 @@
     </div>
   </div>
   <script>
-                // Theme toggle icons
+                    // Theme toggle icons
     const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
     const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
     
