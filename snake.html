@@ -65,14 +65,14 @@
     .sidebar {
       width: 300px;
       height: 600px;
-      padding: 15px;
+      padding: 10px;
       border: 2px solid currentColor;
       border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       background-color: inherit;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
       order: 2;
     }
     /* Uniform Heading Style */
@@ -140,16 +140,15 @@
     /* Control section */
     .control-section {
       margin-top: auto;
-      padding-top: 10px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 10px;
     }
     
     .top-controls {
       display: grid;
       grid-template-columns: 1fr 1fr 34px;
-      gap: 5px;
+      gap: 10px;
     }
     
     .control-box {
@@ -232,21 +231,21 @@
     @media (max-width: 1000px) {
       .container {
         flex-direction: column;
-        padding: 5px;
-        gap: 5px;
+        padding: 10px;
+        gap: 10px;
         height: auto;
       }
       .sidebar {
         width: 98%;
         max-width: 600px;
         height: auto;
-        padding: 8px;
-        gap: 5px;
+        padding: 10px;
+        gap: 10px;
         order: 1;
       }
       .score-section {
         flex-direction: row;
-        gap: 3px;
+        gap: 10px;
       }
       .score-box {
         padding: 3px;
@@ -264,7 +263,8 @@
         height: 100% !important;
       }
       .instructions-box { 
-        flex-direction: row; 
+        flex-direction: row;
+        gap: 10px;
       }
       .instructions-container,
       .food-container { 
@@ -273,15 +273,15 @@
       .control-section {
         display: flex;
         justify-content: space-between;
-        gap: 5px;
+        gap: 10px;
       }
       .game-controls {
         display: flex;
-        gap: 5px;
+        gap: 10px;
       }
       .right-controls {
         display: flex;
-        gap: 5px;
+        gap: 10px;
       }
       .sidebar, .sidebar * { 
         font-size: 1rem !important; 
@@ -289,8 +289,11 @@
       }
     }
     
-    /* Mobile-specific wrapping for food points */
+    /* Mobile-specific wrapping */
     @media (max-width: 1000px) and (hover: none) and (pointer: coarse) {
+      .food-table td {
+        white-space: normal;
+      }
       .food-points {
         width: 100%;
         padding-left: 22px;
@@ -298,8 +301,11 @@
     }
     
     @media (max-height: 700px) {
-      .container { gap: 3px; }
-      .sidebar { padding: 5px; gap: 3px; }
+      .container { gap: 10px; }
+      .sidebar { 
+        padding: 10px;
+        gap: 10px;
+      }
     }
   </style>
 </head>
