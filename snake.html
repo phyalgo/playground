@@ -64,45 +64,26 @@
     /* Sidebar */
     .sidebar {
       width: 300px;
-      height: auto;
-      padding: 20px;
+      height: 600px;
+      padding: 15px;
       border: 2px solid currentColor;
       border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       background-color: inherit;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 20px;
+      gap: 15px;
       order: 2;
-    }
-    /* Force sidebar height to match game container in wide mode */
-    @media (min-width: 1001px) {
-      .sidebar { height: 600px; }
     }
     /* Uniform Heading Style */
     h3 { font-size: 1rem; font-weight: normal; margin: 0; }
-    /* Return to Playground Button */
-    .return-box {
-      border: 2px solid currentColor;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-    .return-box a {
-      color: inherit;
-      text-decoration: none;
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+    
     /* Score Boxes */
     .score-section {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      flex: 0 0 auto;
     }
     .score-box {
       border: 2px solid currentColor;
@@ -116,7 +97,9 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      flex: 1;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
     }
     .instructions-container,
     .food-container {
@@ -127,11 +110,8 @@
       overflow-wrap: break-word;
       word-wrap: break-word;
       white-space: normal;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      justify-content: flex-start;
+      flex: 0 1 auto;
+      min-height: 0;
     }
     .instructions-container ol { margin-left: 20px; }
     .instructions-container li { margin-bottom: 5px; }
@@ -148,38 +128,55 @@
       border-radius: 50%;
       border: 1px solid currentColor;
     }
-    /* In narrow mode, instructions & food are side-by-side but with same text style */
-    @media (max-width: 1000px) {
-      .instructions-box { flex-direction: row; }
-      .instructions-container,
-      .food-container { width: 50%; line-height: 1.5; }
-      .sidebar, .sidebar * { font-size: 1rem !important; font-weight: normal !important; }
-    }
-    /* Controls */
+    
+    /* Control section */
     .control-section {
+      margin-top: auto;
+      padding-top: 10px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 5px;
     }
-    .game-controls {
-      display: flex;
-      gap: 10px;
+    
+    .top-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 34px;
+      gap: 5px;
     }
+    
     .control-box {
       border: 2px solid currentColor;
       border-radius: 8px;
       padding: 5px 10px;
       text-align: center;
       font-size: 1rem;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .control-box button {
-      background: none;
-      border: none;
-      font-family: inherit;
-      font-size: inherit;
+    
+    .return-box {
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 5px 10px;
+      text-align: center;
+      font-size: 1rem;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .return-box a {
       color: inherit;
-      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      display: block;
+      width: 100%;
+      text-align: center;
     }
+    
     .theme-box {
       border: 2px solid currentColor;
       border-radius: 8px;
@@ -187,15 +184,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      height: 34px;
+      width: 34px;
+      flex-shrink: 0;
     }
+    
+    .theme-box svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .control-box button,
     .theme-box button {
       background: none;
       border: none;
-      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
       color: inherit;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
     }
+    
     /* Light Mode adjustments */
     body.light-mode .score-box,
     body.light-mode .control-box,
@@ -205,7 +219,8 @@
     body.light-mode .food-container {
       border: 2px solid #000;
     }
-    /* Responsive adjustments for narrow screens */
+    
+    /* Narrow mode (mobile) */
     @media (max-width: 1000px) {
       .container {
         flex-direction: column;
@@ -216,6 +231,7 @@
       .sidebar {
         width: 98%;
         max-width: 600px;
+        height: auto;
         padding: 8px;
         gap: 5px;
         order: 1;
@@ -229,20 +245,29 @@
         flex: 1;
       }
       #game-container {
-        width: 98%;
+        width: 98vw !important;
+        height: 98vw !important;
         max-width: 600px;
-        height: auto;
-        aspect-ratio: 1;
+        max-height: 600px;
         order: 2;
       }
-      .instructions-box { flex-direction: row; }
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .instructions-box { 
+        flex-direction: row; 
+      }
       .instructions-container,
-      .food-container { width: 50%; }
-      .control-section { gap: 5px; }
-      .game-controls { gap: 5px; }
-      .return-box { padding: 3px; margin-bottom: 3px; }
-      .control-box { padding: 3px 6px; }
+      .food-container { 
+        width: 50%; 
+      }
+      .sidebar, .sidebar * { 
+        font-size: 1rem !important; 
+        font-weight: normal !important; 
+      }
     }
+    
     @media (max-height: 700px) {
       .container { gap: 3px; }
       .sidebar { padding: 5px; gap: 3px; }
@@ -255,10 +280,6 @@
     <div id="game-container"></div>
     <!-- Sidebar -->
     <div class="sidebar">
-      <!-- Return to Playground -->
-      <div class="return-box">
-        <a href="https://phyalgo.github.io/playground/">Return to Playground</a>
-      </div>
       <!-- Score Boxes -->
       <div class="score-section">
         <div class="score-box" id="score-box">
@@ -274,6 +295,7 @@
           <p id="highest-score">0</p>
         </div>
       </div>
+      
       <!-- Instructions & Food Containers -->
       <div class="instructions-box">
         <div class="instructions-container">
@@ -309,24 +331,28 @@
           </table>
         </div>
       </div>
-      <!-- Controls -->
+      
+      <!-- Controls Section -->
       <div class="control-section">
-        <div class="game-controls">
+        <div class="top-controls">
           <div class="control-box">
             <button id="start-btn">Start</button>
           </div>
           <div class="control-box">
             <button id="pause-btn">Pause</button>
           </div>
+          <div class="theme-box">
+            <button id="toggle-mode-btn"></button>
+          </div>
         </div>
-        <div class="theme-box">
-          <button id="toggle-mode-btn"></button>
+        <div class="return-box">
+          <a href="https://phyalgo.github.io/playground/">Return to Playground</a>
         </div>
       </div>
     </div>
   </div>
   <script>
-    // Theme toggle icons
+                // Theme toggle icons
     const sunIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
     const moonIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>';
     
@@ -369,11 +395,23 @@
       pixelDensity(1);
       noSmooth();
       frameRate(isMobile ? 9 : 10);
-      canvas.style('margin', '0');
-      canvas.style('position', 'absolute');
-      canvas.style('left', '50%');
-      canvas.style('top', '50%');
-      canvas.style('transform', 'translate(-50%, -50%)');
+      
+      // Adjust canvas positioning for mobile
+      if (isMobile) {
+        const container = document.getElementById("game-container");
+        const containerSize = Math.min(container.clientWidth, container.clientHeight);
+        const scale = containerSize / canvasSize;
+        
+        canvas.style('width', `${containerSize}px`);
+        canvas.style('height', `${containerSize}px`);
+      } else {
+        canvas.style('margin', '0');
+        canvas.style('position', 'absolute');
+        canvas.style('left', '50%');
+        canvas.style('top', '50%');
+        canvas.style('transform', 'translate(-50%, -50%)');
+      }
+      
       initGame();
       if (isMobile) {
         const canvasEl = document.querySelector("#game-container canvas");
