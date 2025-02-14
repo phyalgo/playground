@@ -239,7 +239,7 @@
     
     /* Narrow mode (mobile) */
     @media (max-width: 1000px) {
-      .container {
+    .container {
         flex-direction: column;
         padding: 10px;
         gap: 10px;
@@ -252,10 +252,14 @@
         padding: 10px;
         gap: 10px;
         order: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
       .score-section {
         flex-direction: row;
         gap: 10px;
+        margin: 0;
       }
       .score-box {
         padding: 3px;
@@ -275,14 +279,17 @@
       .instructions-box { 
         flex-direction: row;
         gap: 10px;
+        margin: 0;
       }
       .instructions-container,
       .food-container { 
-        width: 50%; 
+        width: 50%;
+        margin: 0;
       }
       .control-section {
+        margin: 0;
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         gap: 10px;
       }
       .game-controls {
@@ -293,25 +300,15 @@
         display: flex;
         gap: 10px;
       }
+      .top-controls {
+        gap: 10px;
+      }
+      .return-box {
+        margin: 0;
+      }
       .sidebar, .sidebar * { 
         font-size: 1rem !important; 
         font-weight: normal !important; 
-      }
-    }
-    
-    /* Mobile-specific wrapping */
-    @media (max-width: 1000px) and (hover: none) and (pointer: coarse) {
-      .food-points {
-        width: 100%;
-        padding-left: 22px;
-      }
-    }
-    
-    @media (max-height: 700px) {
-      .container { gap: 10px; }
-      .sidebar { 
-        padding: 10px;
-        gap: 10px;
       }
     }
   </style>
