@@ -72,6 +72,7 @@
       background-color: inherit;
       display: flex;
       flex-direction: column;
+      gap: 10px;
       order: 2;
     }
     /* Uniform Heading Style */
@@ -96,18 +97,11 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin: auto 0;
+      margin-top: 100px;
+      margin-bottom: 100px;
       flex: 0 0 auto;
     }
-    .instructions-container {
-      border: 2px solid currentColor;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 1rem;
-      overflow-wrap: break-word;
-      word-wrap: break-word;
-      white-space: normal;
-    }
+    .instructions-container,
     .food-container {
       border: 2px solid currentColor;
       border-radius: 8px;
@@ -116,6 +110,8 @@
       overflow-wrap: break-word;
       word-wrap: break-word;
       white-space: normal;
+      flex: 0 1 auto;
+      min-height: 0;
     }
     .instructions-container ol {
       margin: 0;
@@ -156,7 +152,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      flex: 0 0 auto;
     }
     
     .top-controls {
@@ -279,7 +274,6 @@
       .instructions-box { 
         flex-direction: row;
         gap: 10px;
-        margin: 10px 0;
       }
       .instructions-container,
       .food-container { 
@@ -420,11 +414,10 @@
     });
     
     // Check if device is mobile
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     document.querySelector('.mobile-rules').style.display = isMobile ? 'block' : 'none';
     document.querySelector('.desktop-rules').style.display = isMobile ? 'none' : 'block';
-    
-    // Prevent mobile browser navigation in game container
+// Prevent mobile browser navigation in game container
     if (isMobile) {
       const gameContainer = document.getElementById('game-container');
       gameContainer.addEventListener('touchmove', e => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
